@@ -1,0 +1,26 @@
+﻿I'm sorry, but an uncaught exception occurred.
+
+While running game code:
+AttributeError: 'NoneType' object has no attribute 'screenshot'
+
+-- Full Traceback ------------------------------------------------------------
+
+Traceback (most recent call last):
+  File "renpy/bootstrap.py", line 401, in bootstrap
+    renpy.main.main()
+    ~~~~~~~~~~~~~~~^^
+  File "renpy/main.py", line 613, in main
+    renpy.display.interface.finish_pending()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "renpy/display/core.py", line 3368, in finish_pending
+    self.check_background_screenshot()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "renpy/display/core.py", line 1360, in check_background_screenshot
+    self.bgscreenshot_surface = renpy.display.draw.screenshot(self.surftree)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^               
+AttributeError: 'NoneType' object has no attribute 'screenshot'
+
+Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.42 x86_64
+Ren'Py 8.5.2.26010301
+Python learning 1.0
+Fri Mar 13 23:40:14 2026

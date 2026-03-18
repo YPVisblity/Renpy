@@ -1,0 +1,104 @@
+import sys
+import pybryt
+
+# 1. 監控器：收集 (步驟順序, 數值)
+
+class ExecutionTracer:
+    def __init__(self, target_names):
+        self.observed_values = [] # 這裡面會存 [(0, 1), (1, 0), ...]
+        self.target_names = target_names
+
+    def trace_calls(self, frame, event, arg):
+        if event == 'return':
+            if isinstance(arg, int):   #判斷是不是型態是否為int
+                func_name = frame.f_code.co_name
+                if func_name in self.target_names:
+                    # 記錄 (順序 Index, 數值 Value)
+                    # 這是最單純的 Tuple，Python 比對 Tuple 絕對是看數值
+                    step_idx = len(self.observed_values)
+                    self.observed_values.append((step_idx, arg))
+        return self.trace_calls
+
+# 2. 老師建立標準 (拆解成 15 個獨立的小條件)
+
+def teacher_fib(n):
+    if n <= 1: return n
+    return teacher_fib(n-1) + teacher_fib(n-2)
+
+print("1. 正在建立老師的標準...")
+tracer = ExecutionTracer(target_names=["teacher_fib"])  #準備路徑專注於teacher_fib
+sys.settrace(tracer.trace_calls)                        #開始攝影 接下來需經過tracer.trace_calls
+teacher_fib(5)                                          #執行遞迴n=5的動作
+sys.settrace(None)                                      #結束攝影
+
+# 建立 15 個獨立的檢查點
+teacher_steps = tracer.observed_values
+annotations = [pybryt.Value(step_tuple) for step_tuple in teacher_steps]  #給pybryt數值
+
+# 告訴 Pybryt：這 15 個條件都要滿足
+teacher_ref = pybryt.ReferenceImplementation("fib_algo", annotations) #建立參考遞迴答案
+
+print(f"標準建立完成！共產生 {len(annotations)} 個檢查點。\n")
+
+# 3. 學生程式碼
+
+def student_loop(n):
+    if n <= 1: return n
+    a, b = 0, 1
+    for _ in range(2, n + 1):
+        a, b = b, a + b
+    return b
+
+def student_recursive(n):
+    if n <= 1: return n
+    return student_recursive(n-1) + student_recursive(n-2)
+
+# 4.評分系統
+
+def grade_student(func, func_name_str, display_name):
+    print(f"--- 評測 {display_name} ---")
+
+    # 1. 錄影
+    tracer = ExecutionTracer(target_names=[func_name_str])
+    sys.settrace(tracer.trace_calls)
+    try:
+        val = func(5)
+    except:
+        sys.settrace(None)
+        return
+    sys.settrace(None)
+
+    print(f"   執行結果: {val}")
+    print(f"   偵測到的運算步驟: {len(tracer.observed_values)}")
+
+    # 2. 建立足跡
+    footprint = pybryt.MemoryFootprint()
+    for step_tuple in tracer.observed_values:
+        footprint.add_value(step_tuple)
+
+    # 3. 比對
+    result = teacher_ref.run(footprint)
+    
+    # result.results 是一個列表，存放每一個檢查點的結果
+    # r.satisfied 是一個 True/False 的布林值
+    passed_count = sum(1 for r in result.results if r.satisfied)
+    total_count = len(result.results)
+
+    # 避免除以零
+    if total_count > 0:
+        score = passed_count / total_count
+    else:
+        score = 0.0
+
+    # 4. 顯示結果
+    if score >= 1.0:
+        print(f"通過！完美符合遞迴特徵")
+        print(f"匹配度: {score:.0%} ({passed_count}/{total_count})")
+    else:
+        print(f"失敗！演算法特徵不符")
+        print(f"匹配度: {score:.0%} ({passed_count}/{total_count})")
+
+    print("\n")
+
+grade_student(student_loop, "student_loop", "學生 A (迴圈)")
+grade_student(student_recursive, "student_recursive", "學生 B (遞迴)")
