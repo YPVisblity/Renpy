@@ -1,0 +1,57 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Build documentation
+
+on:
+  push:
+    branches: [ stable ]
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    
+    - name: Checkout to stable
+      uses: actions/checkout@v2
+      with:
+        ref: stable
+
+    - name: Checkout to gh-pages
+      uses: actions/checkout@v2
+      with:
+        ref: gh-pages
+    
+    - name: Merge stable -> gh-pages
+      run: |
+        git config --global user.name "github-actions"
+        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git merge origin/stable -Xtheirs --allow-unrelated-histories
+        git push origin gh-pages
+        
+    - name: Install dependencies
+      run: |
+        $CONDA/bin/conda env update -f environment.yml -n base
+        $CONDA/bin/pip install -r docs/requirements.txt
+        sudo apt-get install -y pandoc
+        
+    - name: Build documentation
+      working-directory: ./docs
+      run: |
+        make html SPHINXBUILD=$CONDA/bin/sphinx-build
+
+    - name: Commit documentation
+      run: |
+        git add -f docs/html
+        git commit -m "build docs for ${{ github.sha }}" || :
+        git push
+        
