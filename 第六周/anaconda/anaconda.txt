@@ -1,0 +1,11 @@
+(base) C:\Users\user\anaconda3\envs\pybryt_3-8>conda activate pybryt_3-8
+
+EnvironmentNameNotFound: Could not find conda environment: pybryt_3-8
+You can list all discoverable environments with `conda info --envs`.
+
+
+ERROR: 'conda activate pybryt_3-8' exited with code 1.
+在anaconda promt上面
+1. (base) C:\Users\user\anaconda3\envs\pybryt_3-8>conda activate C:\Users\user\anaconda3\envs\pybryt_3-8
+2.conda install ipykernel
+3. python -m ipykernel install --user --name pybryt_3-8 --display-name "Python 3.8 (PyBryt)" 安裝到judpyter

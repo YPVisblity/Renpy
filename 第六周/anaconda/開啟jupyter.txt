@@ -1,0 +1,14 @@
+Step 1：開啟 Anaconda Prompt（不是一般的 cmd）
+從開始選單找 Anaconda Prompt 開啟
+Step 2：切換到正確環境
+bashconda activate pybryt_3-8
+Step 3：確認 Python 版本正確
+bashpython --version
+# 應該顯示 Python 3.8.x
+Step 4：切換到你的工作目錄
+bashcd C:\Users\user\你的資料夾路徑
+Step 5：再執行 nbconvert 測試
+bashjupyter nbconvert --to notebook --execute student_.ipynb --output test_out.ipynb
+Step 6：開啟 Jupyter Notebook
+bashjupyter notebook
+然後在瀏覽器裡執行你的 PyBryt 程式碼。

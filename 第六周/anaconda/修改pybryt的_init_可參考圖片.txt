@@ -1,0 +1,17 @@
+
+都在__init__.py 底下
+_, footprint_fp = mkstemp()
+footprint_fp = footprint_fp.replace("\\", "/")
+====================================================
+with open(footprint_fp, "rb") as f:
+    footprint: MemoryFootprint = dill.load(f)
+
+os.remove(footprint_fp)
+修改成
+with open(footprint_fp, "rb") as f:
+    footprint: MemoryFootprint = dill.load(f)
+
+try:
+    os.remove(footprint_fp)
+except PermissionError:
+    pass
