@@ -1,0 +1,1130 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Code Quest</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: #f8fafc;
+            font-family: Arial, "Microsoft JhengHei", sans-serif;
+            background: #0f2130;
+        }
+
+        button,
+        textarea,
+        input {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .shell {
+            min-height: 100vh;
+            background:
+                linear-gradient(135deg, rgba(16, 37, 54, 0.92), rgba(7, 18, 30, 0.84)),
+                url("/static/pages/images/mainbackground.png") center/cover no-repeat;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            min-height: 78px;
+            padding: 14px clamp(18px, 5vw, 74px);
+            background: #111827;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.26);
+        }
+
+        .logo {
+            color: #facc15;
+            font-size: clamp(26px, 4vw, 42px);
+            font-weight: 900;
+            letter-spacing: 0;
+            text-shadow: 0 4px 0 #5b2b12, 0 8px 0 rgba(0, 0, 0, 0.4);
+            transform: rotate(-2deg);
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-pill,
+        .primary-button,
+        .secondary-button,
+        .ai-button,
+        .tab-button {
+            border: 0;
+            border-radius: 8px;
+            font-weight: 800;
+        }
+
+        .nav-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 14px;
+            color: #dbeafe;
+            background: #1f2937;
+            text-decoration: none;
+        }
+
+        .primary-button {
+            padding: 14px 24px;
+            color: #102018;
+            background: #34d399;
+            box-shadow: 0 12px 0 #167853, 0 18px 38px rgba(0, 0, 0, 0.32);
+        }
+
+        .secondary-button {
+            padding: 11px 16px;
+            color: #f8fafc;
+            background: #334155;
+        }
+	.ai-button {
+	    display: inline-block;
+	    padding: 14px 24px;
+	    color: #10202d;       
+	    background: #3b82f6;      
+	    box-shadow: 0 12px 0 #1d4ed8, 0 18px 38px rgba(0, 0, 0, 0.32); 
+	    /* #可加可不加 
+	    border: none;
+	    border-radius: 12px;   
+	    font-weight: bold;    
+	    text-decoration: none; 
+	    cursor: pointer; */
+	}
+	
+	.ai-button:hover {
+	    background: #60a5fa;
+	}
+	
+	.ai-button:active {
+	    box-shadow: 0 4px 0 #1d4ed8, 0 8px 18px rgba(0, 0, 0, 0.32);
+	    transform: translateY(8px); 
+	}
+	
+        .start-screen {
+            display: grid;
+            min-height: calc(100vh - 78px);
+            place-items: center;
+            padding: 44px 22px;
+        }
+
+        .start-card {
+            width: min(780px, 100%);
+            text-align: center;
+        }
+
+        .title-frame {
+            margin: 0 auto 34px;
+            padding: 28px;
+            border: 5px solid #0b1220;
+            border-radius: 8px;
+            color: #fff7ed;
+            background: rgba(15, 23, 42, 0.74);
+            box-shadow: 0 18px 0 rgba(0, 0, 0, 0.22);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(48px, 10vw, 104px);
+            line-height: 1;
+            letter-spacing: 0;
+        }
+
+        .subtitle {
+            margin: 18px auto 0;
+            max-width: 640px;
+            color: #bfdbfe;
+            font-size: 20px;
+            line-height: 1.7;
+        }
+
+        .map-screen {
+            display: none;
+            min-height: calc(100vh - 78px);
+            padding: 26px 0 34px;
+        }
+
+        .map-screen.is-active {
+            display: block;
+        }
+
+        .map-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            padding: 0 clamp(18px, 5vw, 74px) 22px;
+        }
+
+        .map-head h2 {
+            margin: 0;
+            color: #ffffff;
+            font-size: clamp(28px, 4vw, 44px);
+            letter-spacing: 0;
+            text-shadow: 0 4px 0 rgba(0, 0, 0, 0.28);
+        }
+
+        .map-head p {
+            margin: 8px 0 0;
+            color: #cbd5e1;
+        }
+
+        .map-window {
+            position: relative;
+            min-height: 560px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 70px 80px 130px;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            background:
+                radial-gradient(circle at 14% 24%, rgba(255, 255, 255, 0.08) 0 46px, transparent 47px),
+                radial-gradient(circle at 46% 68%, rgba(255, 255, 255, 0.07) 0 58px, transparent 59px),
+                radial-gradient(circle at 84% 30%, rgba(255, 255, 255, 0.07) 0 52px, transparent 53px);
+        }
+
+        .map-window::-webkit-scrollbar {
+            height: 14px;
+        }
+
+        .map-window::-webkit-scrollbar-thumb {
+            border-radius: 999px;
+            background: #facc15;
+        }
+
+        .map-track {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 130px;
+            width: max-content;
+            min-width: 1150px;
+            min-height: 360px;
+        }
+        
+        .notebook-wrap {
+	    display: flex;
+	    flex-direction: column;
+	    background: #0d0d1a;
+	    border-radius: 8px;
+	    overflow: hidden;
+	    font-family: 'Fira Code', 'JetBrains Mono', monospace;
+	    min-height: 400px;
+	}
+
+	/* Toolbar */
+	.nb-toolbar {
+	    display: flex;
+	    align-items: center;
+	    justify-content: space-between;
+	    padding: 8px 14px;
+	    background: #12122a;
+	    border-bottom: 1px solid #2a2a50;
+	}
+	.nb-title { color: #a9b1d6; font-size: 13px; font-weight: 600; }
+	.nb-toolbar-actions { display: flex; gap: 6px; }
+	.nb-btn {
+	    padding: 4px 10px;
+	    background: #1e1e3f;
+	    border: 1px solid #3b3b6d;
+	    border-radius: 4px;
+	    color: #a9b1d6;
+	    font-size: 12px;
+	    cursor: pointer;
+	    transition: background 0.15s;
+	}
+	.nb-btn:hover { background: #2a2a5a; }
+
+	/* Cell */
+	.nb-cell {
+	    display: flex;
+	    align-items: stretch;
+	    border-bottom: 1px solid #1a1a35;
+	    position: relative;
+	    transition: border-left 0.1s;
+	    border-left: 3px solid transparent;
+	}
+	.nb-cell.is-active  { border-left-color: #7aa2f7; }
+	.nb-cell.is-running { border-left-color: #e0af68; }
+
+	.nb-cell-gutter {
+	    display: flex;
+	    flex-direction: column;
+	    align-items: center;
+	    padding: 8px 4px;
+	    min-width: 50px;
+	    background: #0d0d1a;
+	    gap: 6px;
+	}
+	.nb-run-btn {
+	    background: none;
+	    border: none;
+	    color: #9ece6a;
+	    font-size: 15px;
+	    cursor: pointer;
+	    padding: 0;
+	    line-height: 1;
+	}
+	.nb-run-btn:hover { color: #c3e88d; }
+	.nb-counter { color: #3b4261; font-size: 11px; white-space: nowrap; }
+
+	.nb-cell-body { flex: 1; overflow: hidden; }
+
+	.nb-del-btn {
+	    position: absolute;
+	    top: 4px;
+	    right: 4px;
+	    background: none;
+	    border: none;
+	    color: #3b4261;
+	    cursor: pointer;
+	    font-size: 12px;
+	    opacity: 0;
+	    transition: opacity 0.15s;
+	}
+	.nb-cell:hover .nb-del-btn { opacity: 1; }
+	.nb-del-btn:hover { color: #f7768e; }
+
+	/* CodeMirror 覆寫 */
+	.nb-editor .CodeMirror {
+	    background: #1a1b2e !important;
+	    color: #a9b1d6 !important;
+	    font-size: 13px;
+	    height: auto;
+	    min-height: 52px;
+	    font-family: 'Fira Code', 'JetBrains Mono', monospace;
+	}
+	.nb-editor .CodeMirror-gutters {
+	    background: #12122a !important;
+	    border-right: 1px solid #2a2a50 !important;
+	}
+	.nb-editor .CodeMirror-linenumber { color: #3b4261 !important; }
+
+	/* Output */
+	.nb-output {
+	    padding: 0;
+	    font-size: 12px;
+	    white-space: pre-wrap;
+	    font-family: 'Fira Code', monospace;
+	    margin-left: 50px;
+	    max-height: 200px;
+	    overflow-y: auto;
+	}
+	.nb-output.is-stdout {
+	    padding: 6px 10px;
+	    color: #c3e88d;
+	    background: #0d1117;
+	    border-top: 1px dashed #1a2a1a;
+	}
+	.nb-output.is-error {
+	    padding: 6px 10px;
+	    color: #f7768e;
+	    background: #1a0d0d;
+	    border-top: 1px dashed #2a1a1a;
+	}
+
+	/* Footer */
+	.nb-footer {
+	    display: flex;
+	    align-items: center;
+	    justify-content: space-between;
+	    padding: 8px 14px;
+	    background: #12122a;
+	    border-top: 1px solid #2a2a50;
+	    flex-wrap: wrap;
+	    gap: 8px;
+	}
+	.nb-kernel-status { font-size: 11px; color: #565f89; }
+	.nb-submit-row { display: flex; align-items: center; gap: 8px; }
+	.nb-player-input {
+	    padding: 4px 8px;
+	    background: #1e1e3f;
+	    border: 1px solid #3b3b6d;
+	    border-radius: 4px;
+	    color: #a9b1d6;
+	    font-size: 12px;
+	    width: 120px;
+	}
+	.nb-submit-btn {
+	    padding: 5px 14px;
+	    background: #7aa2f7;
+	    border: none;
+	    border-radius: 4px;
+	    color: #0d0d1a;
+	    font-size: 12px;
+	    font-weight: 700;
+	    cursor: pointer;
+	    transition: background 0.15s;
+	}
+	.nb-submit-btn:hover { background: #89b4fa; }
+	.nb-submit-status { font-size: 12px; color: #9ece6a; }
+
+	/* PyBryt 回饋 */
+	.nb-feedback {
+	    padding: 12px 16px;
+	    background: #0d1117;
+	    border-top: 1px solid #2a2a50;
+	}
+	.fb-title { color: #a9b1d6; font-size: 13px; margin: 0 0 8px; }
+	.fb-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
+	.fb-item {
+	    display: flex;
+	    align-items: center;
+	    gap: 8px;
+	    padding: 4px 8px;
+	    border-radius: 4px;
+	    font-size: 12px;
+	}
+	.fb-pass { background: #0d2010; color: #9ece6a; }
+	.fb-fail { background: #2a0d10; color: #f7768e; }
+	.fb-icon { font-weight: 700; }
+	.fb-name { font-weight: 600; }
+	.fb-msg  { opacity: 0.8; }
+
+        .map-track::before {
+            position: absolute;
+            top: 48%;
+            left: 96px;
+            width: calc(100% - 192px);
+            height: 12px;
+            border-radius: 999px;
+            background: repeating-linear-gradient(90deg, #eab308 0 54px, #92400e 54px 78px);
+            box-shadow: 0 8px 0 rgba(0, 0, 0, 0.22);
+            content: "";
+        }
+
+        .level-node {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            width: 190px;
+            min-height: 240px;
+            place-items: center;
+            border: 0;
+            color: #fff7ed;
+            background: transparent;
+            text-align: center;
+            transform: translateY(calc((var(--lift) * -74px) + 30px));
+        }
+
+        .level-island {
+            display: grid;
+            width: 172px;
+            height: 146px;
+            place-items: center;
+            border: 5px solid #3f2a19;
+            border-radius: 42% 58% 52% 48% / 46% 39% 61% 54%;
+            background:
+                linear-gradient(145deg, #5b3a22 0 24%, #8b5e34 25% 45%, #315f3b 46% 100%);
+            box-shadow: 0 14px 0 #1f2937, 0 28px 38px rgba(0, 0, 0, 0.32);
+            transition: transform 0.18s ease, filter 0.18s ease;
+        }
+
+        .level-node:hover .level-island,
+        .level-node.is-selected .level-island {
+            filter: brightness(1.12);
+            transform: translateY(-8px);
+        }
+
+        .level-icon {
+            display: grid;
+            width: 74px;
+            height: 74px;
+            place-items: center;
+            border: 5px solid #78350f;
+            border-radius: 50%;
+            color: #422006;
+            background: #facc15;
+            font-size: 34px;
+            font-weight: 900;
+            box-shadow: inset 0 -9px 0 rgba(146, 64, 14, 0.24);
+        }
+
+        .level-name {
+            display: block;
+            margin-top: 18px;
+            padding: 10px 14px;
+            border: 3px solid #111827;
+            border-radius: 8px;
+            color: #111827;
+            background: #fef3c7;
+            font-size: 20px;
+            font-weight: 900;
+            box-shadow: 0 6px 0 rgba(0, 0, 0, 0.28);
+        }
+
+        .level-code {
+            display: block;
+            margin-top: 9px;
+            color: #e5e7eb;
+            font-weight: 800;
+            text-shadow: 0 3px 0 rgba(0, 0, 0, 0.36);
+        }
+
+        .detail-panel {
+            display: none;
+            margin: 24px clamp(18px, 5vw, 74px) 0;
+            border: 4px solid #0b1220;
+            border-radius: 8px;
+            background: #f8fafc;
+            color: #111827;
+            box-shadow: 0 18px 0 rgba(0, 0, 0, 0.24);
+        }
+
+        .detail-panel.is-open {
+            display: block;
+        }
+
+        .detail-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 18px;
+            color: #f8fafc;
+            background: #111827;
+        }
+
+        .detail-title h3 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .detail-title span {
+            display: block;
+            margin-top: 6px;
+            color: #cbd5e1;
+        }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 14px 18px;
+            background: #e2e8f0;
+        }
+
+        .tab-button {
+            padding: 11px 16px;
+            color: #1f2937;
+            background: #ffffff;
+            box-shadow: 0 4px 0 #cbd5e1;
+        }
+
+        .tab-button.is-active {
+            color: #102018;
+            background: #34d399;
+            box-shadow: 0 4px 0 #167853;
+        }
+
+        .tab-body {
+            min-height: 480px;
+            padding: 18px;
+        }
+
+        .iframe-wrap {
+            height: min(58vh, 640px);
+            min-height: 430px;
+            overflow: hidden;
+            border: 3px solid #111827;
+            border-radius: 8px;
+            background: #0b1020;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            background: #ffffff;
+        }
+
+        .discussion-grid,
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .paper-card {
+            min-height: 160px;
+            padding: 18px;
+            border: 3px solid #111827;
+            border-radius: 8px;
+            background: #fff7ed;
+            box-shadow: 0 8px 0 #d6b98a;
+        }
+
+        .paper-card h4 {
+            margin: 0 0 10px;
+            font-size: 20px;
+        }
+
+        .paper-card p {
+            margin: 0;
+            color: #374151;
+            line-height: 1.7;
+        }
+
+        .submit-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 220px;
+            gap: 14px;
+            margin-top: 16px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            resize: vertical;
+            padding: 14px;
+            border: 3px solid #111827;
+            border-radius: 8px;
+            color: #d1fae5;
+            background: #0b1020;
+            line-height: 1.5;
+        }
+
+        .submit-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        input {
+            width: 100%;
+            padding: 11px 12px;
+            border: 3px solid #111827;
+            border-radius: 8px;
+        }
+
+        .status {
+            min-height: 44px;
+            color: #166534;
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.5;
+        }
+
+        .logout-form {
+            margin: 0;
+        }
+
+        .user-name {
+            color: #a7f3d0;
+            font-weight: 800;
+        }
+
+        @media (max-width: 880px) {
+            .topbar,
+            .map-head,
+            .detail-head {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .map-window {
+                min-height: 500px;
+                padding-inline: 34px;
+            }
+
+            .map-track {
+                gap: 80px;
+                min-width: 980px;
+            }
+
+            .discussion-grid,
+            .stats-grid,
+            .submit-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="shell">
+        <header class="topbar">
+            <div class="top-actions">
+                {% if user.is_authenticated %}
+                    <span class="user-name">{{ user.username }}</span>
+                    <form class="logout-form" action="{% url 'logout' %}" method="post">
+                        {% csrf_token %}
+                        <button class="nav-pill" type="submit">登出</button>
+                    </form>
+                {% else %}
+                    <a class="nav-pill" href="{% url 'login' %}">登入</a>
+                {% endif %}
+                <a class="primary-button" href="/admin/">管理</a>
+         	<a class="ai-button" href="{% url 'ai_chat' %}">AI問答區 </a>
+            </div>
+        </header>
+
+        <section class="start-screen" id="startScreen">
+            <div class="start-card">
+                <div class="title-frame">
+                    <h1>pybryt</h1>
+                </div>
+                <button class="primary-button" id="startButton">開始遊戲</button>
+            </div>
+        </section>
+
+        <main class="map-screen" id="mapScreen">
+            <div class="map-head">
+                <div>
+                    <h2>章節</h2>
+                </div>
+                <button class="secondary-button" id="backButton">返回首頁</button>
+            </div>
+
+            <section class="map-window" aria-label="橫向地圖">
+                <div class="map-track">
+                    {% for level in levels %}
+                        <button class="level-node" data-level="{{ level.id }}" style="--lift: {{ forloop.counter0|divisibleby:2|yesno:'0,1' }};">
+                            <span class="level-island">
+                                <span class="level-icon">{{ forloop.counter }}</span>
+                            </span>
+                            <span class="level-name">{{ level.title }}</span>
+                            <span class="level-code">{{ level.chapter }} · {{ level.level }}</span>
+                        </button>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="detail-panel" id="detailPanel">
+                <div class="detail-head">
+                    <div class="detail-title">
+                        <h3 id="levelTitle">選擇關卡</h3>
+                        <span id="levelMeta"></span>
+                    </div>
+                    <button class="secondary-button" id="closePanel">關閉關卡</button>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab-button is-active" data-tab="story">劇情</button>
+                    <button class="tab-button" data-tab="game">遊戲</button>
+                    <button class="tab-button" data-tab="discussion">討論區</button>
+                    <button class="tab-button" data-tab="stats">關卡統計</button>
+                </div>
+
+                <div class="tab-body" id="tabBody"></div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const levels = {{ levels_json|safe }};
+        let selectedLevel = "chapter-1-level-1";
+        let selectedTab = "story";
+
+        const startScreen = document.querySelector("#startScreen");
+        const mapScreen = document.querySelector("#mapScreen");
+        const detailPanel = document.querySelector("#detailPanel");
+        const levelTitle = document.querySelector("#levelTitle");
+        const levelMeta = document.querySelector("#levelMeta");
+        const tabBody = document.querySelector("#tabBody");
+        
+        let pyodide = null;
+	let pyodideReady = false;
+	let nbCells = new Map();   // cellId → { editor, outputEl, counterEl }
+	let cellSeq = 0;
+	let execCount = 0;
+
+	async function ensurePyodide() {
+	    if (pyodideReady) return;
+	    if (!window.loadPyodide) {
+		await new Promise((resolve, reject) => {
+		    const s = document.createElement("script");
+		    s.src = "https://cdn.jsdelivr.net/pyodide/v0.25.1/full/pyodide.js";
+		    s.onload = resolve;
+		    s.onerror = reject;
+		    document.head.appendChild(s);
+		});
+	    }
+	    document.getElementById("kernelStatus").textContent = "🟡 Kernel 啟動中...";
+	    pyodide = await loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.25.1/full/" });
+	    pyodideReady = true;
+	    const el = document.getElementById("kernelStatus");
+	    if (el) el.textContent = "🟢 Kernel 就緒";
+	}
+	
+        function getLevel() {
+            return levels[selectedLevel];
+        }
+	
+        function renderTab() {
+            const level = getLevel();
+            levelTitle.textContent = `${level.chapter}：${level.title}`;
+            levelMeta.textContent = `小關：${level.level} · 難度：${level.difficulty}`;
+
+            document.querySelectorAll(".level-node").forEach((node) => {
+                node.classList.toggle("is-selected", node.dataset.level === selectedLevel);
+            });
+
+            document.querySelectorAll(".tab-button").forEach((button) => {
+                button.classList.toggle("is-active", button.dataset.tab === selectedTab);
+            });
+
+            if (selectedTab === "story") {
+                tabBody.innerHTML = `
+                    <div class="iframe-wrap">
+                        <iframe src="${level.story_url}" title="${level.title} 劇情"></iframe>
+                    </div>
+                `;
+                return;
+            }
+
+            if (selectedTab === "game") {
+	    tabBody.innerHTML = `
+		<div class="notebook-wrap">
+		    <!-- Notebook Toolbar -->
+		    <div class="nb-toolbar">
+		        <span class="nb-title">${level.title}</span>
+		        <div class="nb-toolbar-actions">
+		            <button class="nb-btn" id="runAllBtn">▶▶ Run All</button>
+		            <button class="nb-btn" id="addCellBtn">＋ 新增 Cell</button>
+		        </div>
+		    </div>
+
+		    <!-- Cells 區 -->
+		    <div class="nb-cells" id="nbCells"></div>
+
+		    <!-- 底部提交列 -->
+		    <div class="nb-footer">
+		        <span class="nb-kernel-status" id="kernelStatus">⚪ Kernel 載入中...</span>
+		        <div class="nb-submit-row">
+		            <input class="nb-player-input" id="playerName" placeholder="玩家名稱" value="player">
+		            <button class="nb-submit-btn" id="submitButton">⬆ 提交 .ipynb</button>
+		            <span class="nb-submit-status" id="submitStatus"></span>
+		        </div>
+		    </div>
+
+		    <!-- 鑑定回饋區 -->
+		    <div class="nb-feedback" id="nbFeedback" style="display:none"></div>
+		</div>
+	    `;
+	    initNotebook(level);
+	    return;
+	}
+
+            if (selectedTab === "discussion") {
+                window.location.href = "/blog/";
+                return;
+            }
+
+            tabBody.innerHTML = `
+                <div class="stats-grid">
+                    <article class="paper-card">
+                        <h4>章節</h4>
+                        <p>${level.chapter}</p>
+                    </article>
+                    <article class="paper-card">
+                        <h4>小關</h4>
+                        <p>${level.level}</p>
+                    </article>
+                    <article class="paper-card">
+                        <h4>關卡重點</h4>
+                        <p>${level.summary}</p>
+                    </article>
+                </div>
+            `;
+        }
+
+        function openLevel(levelId) {
+            selectedLevel = levelId;
+            selectedTab = "story";
+            detailPanel.classList.add("is-open");
+            renderTab();
+            detailPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+	//建立單一 Cell
+	function createCell(initialCode = "") {
+	    cellSeq++;
+	    const id = `cell-${cellSeq}`;
+
+	    const cellEl = document.createElement("div");
+	    cellEl.className = "nb-cell";
+	    cellEl.dataset.id = id;
+	    cellEl.innerHTML = `
+		<div class="nb-cell-gutter">
+		    <button class="nb-run-btn" title="執行 (Shift+Enter)">▶</button>
+		    <span class="nb-counter" id="counter-${id}">[ ]</span>
+		</div>
+		<div class="nb-cell-body">
+		    <div class="nb-editor" id="editor-${id}"></div>
+		    <div class="nb-output" id="output-${id}"></div>
+		</div>
+		<button class="nb-del-btn" title="刪除此 Cell">✕</button>
+	    `;
+
+	    document.getElementById("nbCells").appendChild(cellEl);
+
+	    // 載入 CodeMirro（若尚未載入則動態注入）
+	    function mountEditor() {
+		const editor = CodeMirror(document.getElementById(`editor-${id}`), {
+		    value: initialCode,
+		    mode: "python",
+		    theme: "dracula",
+		    lineNumbers: true,
+		    matchBrackets: true,
+		    autoCloseBrackets: true,
+		    indentUnit: 4,
+		    extraKeys: {
+		        "Shift-Enter": () => runCell(id),
+		        "Tab": (cm) => cm.execCommand("indentMore"),
+		    }
+		});
+		editor.on("focus", () => {
+		    document.querySelectorAll(".nb-cell").forEach(c => c.classList.remove("is-active"));
+		    cellEl.classList.add("is-active");
+		});
+		const outputEl = document.getElementById(`output-${id}`);
+		const counterEl = document.getElementById(`counter-${id}`);
+		nbCells.set(id, { editor, outputEl, counterEl, cellEl });
+	    }
+
+	    // 確保 CodeMirror已載入
+	    if (window.CodeMirror) {
+		mountEditor();
+	    } else {
+		loadCodeMirror().then(mountEditor);
+	    }
+
+	    // 刪除 Cell
+	    cellEl.querySelector(".nb-del-btn").addEventListener("click", () => {
+		if (nbCells.size <= 1) return;
+		nbCells.delete(id);
+		cellEl.remove();
+	    });
+
+	    return id;
+	}
+		//動態載入 CodeMirror
+	function loadCodeMirror() {
+	    return new Promise((resolve) => {
+		if (window.CodeMirror) return resolve();
+		const css1 = document.createElement("link");
+		css1.rel = "stylesheet";
+		css1.href = "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css";
+		document.head.appendChild(css1);
+
+		const css2 = document.createElement("link");
+		css2.rel = "stylesheet";
+		css2.href = "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css";
+		document.head.appendChild(css2);
+
+		const js = document.createElement("script");
+		js.src = "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js";
+		js.onload = () => {
+		    const py = document.createElement("script");
+		    py.src = "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js";
+		    py.onload = () => {
+		        const ab = document.createElement("script");
+		        ab.src = "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js";
+		        ab.onload = resolve;
+		        document.head.appendChild(ab);
+		    };
+		    document.head.appendChild(py);
+		};
+		document.head.appendChild(js);
+	    });
+	}
+	async function runCell(id) {
+	    const { editor, outputEl, counterEl, cellEl } = nbCells.get(id);
+	    const code = editor.getValue().trim();
+	    if (!code) return;
+
+	    await ensurePyodide();
+	    
+	    // 自動偵測並安裝需要的套件
+	    try {
+		await pyodide.loadPackagesFromImports(code);
+	    } catch(e) { /* 忽略安裝錯誤 */ }
+
+	    cellEl.classList.add("is-running");
+	    counterEl.textContent = "[*]";
+	    outputEl.textContent = "";
+	    outputEl.className = "nb-output";
+
+	    try {
+		// 捕捉 stdout
+		pyodide.runPython(`
+	import sys, io as _io
+	_buf = _io.StringIO()
+	sys.stdout = _buf
+	sys.stderr = _buf
+	`);
+		let result;
+		try {
+		    result = pyodide.runPython(code);
+		} finally {
+		    pyodide.runPython("sys.stdout = sys.__stdout__; sys.stderr = sys.__stderr__");
+		}
+		const stdout = pyodide.runPython("_buf.getvalue()");
+
+		execCount++;
+		counterEl.textContent = `[${execCount}]`;
+
+		let out = stdout || "";
+		if (result !== undefined && result !== null && String(result) !== "undefined") {
+		    out += (out ? "\n" : "") + String(result);
+		}
+		if (out.trim()) {
+		    outputEl.textContent = out;
+		    outputEl.classList.add("is-stdout");
+		}
+	    } catch (err) {
+		execCount++;
+		counterEl.textContent = `[${execCount}]`;
+		outputEl.textContent = String(err);
+		outputEl.classList.add("is-error");
+	    }
+
+	    cellEl.classList.remove("is-running");
+	}
+
+	//組出標準.ipynb
+	function buildIpynb() {
+	    const cells = [...nbCells.values()].map(({ editor }) => {
+		const source = editor.getValue();
+		return {
+		    cell_type: "code",
+		    execution_count: null,
+		    metadata: {},
+		    outputs: [],
+		    source: source.split("\n").map((line, i, arr) =>
+		        i < arr.length - 1 ? line + "\n" : line
+		    )
+		};
+	    }).filter(c => c.source.join("").trim() !== "");
+
+	    return {
+		nbformat: 4,
+		nbformat_minor: 5,
+		metadata: {
+		    kernelspec: { display_name: "Python 3", language: "python", name: "python3" },
+		    language_info: { name: "python", version: "3.10.0" }
+		},
+		cells
+	    };
+	}
+
+	//提交.ipynb到 Django
+	async function submitNotebook() {
+	    const status = document.getElementById("submitStatus");
+	    const player = document.getElementById("playerName")?.value || "player";
+	    const notebook = buildIpynb();
+
+	    if (notebook.cells.length === 0) {
+		status.textContent = "請先在 Cell中輸入程式碼。";
+		return;
+	    }
+
+	    const body = new URLSearchParams();
+	    body.set("level", selectedLevel);
+	    body.set("player", player);
+	    body.set("notebook", JSON.stringify(notebook));// ← 送.ipynb JSON
+
+	    status.textContent="提交中...";
+
+	    try {
+		const response = await fetch("/submit-solution/", {
+		    method: "POST",
+		    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+		    body
+		});
+		const result = await response.json();
+		status.textContent = result.message;
+
+		// 顯示 PyBryt回饋
+		if (result.feedback && result.feedback.length > 0) {
+		    const fb = document.getElementById("nbFeedback");
+		    fb.style.display = "block";
+		    fb.innerHTML = `
+		    <h4 class="fb-title">${result.passed ? "全部通過！" : "PyBryt鑑定回饋"}</h4>
+		    <ul class="fb-list">
+			${result.feedback.map(f => `
+			    <li class="fb-item ${f.passed ? 'fb-pass' : 'fb-fail'}">
+				<span class="fb-icon">${f.passed ? '正確':'錯誤'}</span>
+				<span class="fb-name">${f.name}</span>
+				<span class="fb-msg">${f.message}</span>
+			    </li>
+			`).join("")}
+		    </ul>
+		`;
+		}
+	    } catch {
+		status.textContent="提交失敗，請確認 Django 伺服器仍在執行。";
+	    }
+	}
+
+	//初始化整個 Notebook
+	function initNotebook(level) {
+	    nbCells.clear();
+	    cellSeq = 0;
+	    execCount = 0;
+
+	    //先載入 CodeMirror，再建立初始 cell
+	    loadCodeMirror().then(() => {
+		createCell(`# ${level.title}\n# 在這裡撰寫你的解答\n\n`);
+	    });
+
+	    // 啟動 Pyodide（背景執行，不阻塞 UI）
+	    ensurePyodide();
+
+	    // 綁定按鈕
+	    document.getElementById("addCellBtn").addEventListener("click", () => createCell());
+	    document.getElementById("runAllBtn").addEventListener("click", async () => {
+		for (const id of nbCells.keys()) await runCell(id);
+	    });
+	    document.getElementById("submitButton").addEventListener("click", submitNotebook);
+	}
+	
+	document.querySelector("#startButton").addEventListener("click", () => {
+            startScreen.style.display = "none";
+            mapScreen.classList.add("is-active");
+        });
+
+        document.querySelector("#backButton").addEventListener("click", () => {
+            mapScreen.classList.remove("is-active");
+            detailPanel.classList.remove("is-open");
+            startScreen.style.display = "grid";
+        });
+
+        document.querySelector("#closePanel").addEventListener("click", () => {
+            detailPanel.classList.remove("is-open");
+        });
+
+        document.querySelectorAll(".level-node").forEach((node) => {
+            node.addEventListener("click", () => openLevel(node.dataset.level));
+        });
+
+        document.querySelectorAll(".tab-button").forEach((button) => {
+            button.addEventListener("click", () => {
+                selectedTab = button.dataset.tab;
+                renderTab();
+            });
+        });
+        
+    </script>
+</body>
+</html>
