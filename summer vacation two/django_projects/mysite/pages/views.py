@@ -51,6 +51,13 @@ LEVELS = [
             "starter_code": "# 在這裡寫程式\n",
             "test_code": "value(26,6)",
         },
+        {
+            "id":"chapter-1-level-1-2",
+            "title":"解釋變數",
+            "description":"設定a為一頭牛，b為吃了一顆草?\t請輸出a+b的結果",
+            "starter_code":"#請在這裡寫程式\n",
+            "test_code":"value(a,b)",
+        },
         ]
     },
     {

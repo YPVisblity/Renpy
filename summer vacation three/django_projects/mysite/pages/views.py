@@ -29,7 +29,7 @@ from nbconvert.preprocessors import ExecutePreprocessor as _EP
 from textwrap import indent
 
 
-client=genai.Client(api_key="")
+client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
 
 EDITABLE_STUDENT_FILE_TYPES = {".ipynb", ".py", ".txt", ".json", ".md"}
