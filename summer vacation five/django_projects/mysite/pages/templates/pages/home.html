@@ -158,6 +158,25 @@
             font-size: 20px;
             line-height: 1.7;
         }
+        
+        #iframeWrap:-webkit-full-screen {
+            width: 100vw;
+            height: 100vh;
+            aspect-ratio: unset;
+            border-radius: 0;
+        }
+
+        #iframeWrap:fullscreen {
+            width: 100vw;
+            height: 100vh;
+            aspect-ratio: unset;
+            border-radius: 0;
+        }
+
+        #iframeWrap:fullscreen iframe {
+            width: 100%;
+            height: 100%;
+        }
 
         .map-screen {
             display: none;
@@ -257,6 +276,14 @@
             cursor: pointer;
             text-align: left;
             transition: transform 0.15s;
+
+            width: 210px;        
+            height: 200px;        
+            flex-shrink: 0;       
+
+            overflow-y: auto;     
+            box-sizing: border-box;
+
         }
 
         .topic-card:hover {
@@ -279,6 +306,7 @@
             font-size: 13px;
             color: #374151;
             line-height: 1.5;
+            white-space: pre-wrap;
         }
         .discussion-wrap { display: flex; flex-direction: column; gap: 16px; }
 
@@ -321,7 +349,7 @@
         .post-header { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
         .post-author { font-weight: 800; color: #111827; font-size: 14px; }
         .post-time { color: #9ca3af; font-size: 12px; }
-        .post-content { color: #374151; font-size: 14px; line-height: 1.6; margin-bottom: 10px; }
+        .post-content { color: #374151; font-size: 14px; line-height: 1.6; margin-bottom: 10px; white-space: pre-wrap;}
 
         .post-actions { display: flex; gap: 8px; }
         .post-actions button {
@@ -360,6 +388,7 @@
             color: #a9b1d6;
             font-size: 13px;
             line-height: 1.7;
+            white-space: pre-line;
         }
         .nb-cell-locked {
             border-left: 3px solid #e0af68 !important;
@@ -1047,11 +1076,27 @@
             });
 
             if (selectedTab === "story") {
-                tabBody.innerHTML = `
-                    <div class="iframe-wrap">
-                        <iframe src="${level.story_url}" title="${level.title} 劇情"></iframe>
+               tabBody.innerHTML = `
+                    <div style="position:relative;">
+                        <button id="fullscreenBtn" style="
+                            position:absolute; top:8px; right:8px; z-index:10;
+                            padding:6px 12px; border:none; border-radius:6px;
+                            background:rgba(0,0,0,0.6); color:#fff;
+                            font-size:12px; cursor:pointer;">⤢全螢幕</button>
+                        <div class="iframe-wrap" id="iframeWrap">
+                            <iframe id="storyIframe" src="${level.story_url}" title="${level.title} 劇情"></iframe>
+                        </div>
                     </div>
                 `;
+
+                document.getElementById("fullscreenBtn").addEventListener("click", () => {
+                    const wrap = document.getElementById("iframeWrap");
+                    if (wrap.requestFullscreen) {
+                        wrap.requestFullscreen();
+                    } else if (wrap.webkitRequestFullscreen) {
+                        wrap.webkitRequestFullscreen();
+                    }
+                });
                 return;
             }
 
@@ -1068,9 +1113,7 @@
                     </div>
                 </div>
                 <!--Question區-->
-                    <div class="nb-question" id="nbQuestion" style="display:block">
-                    <p>${selectedTopic ? selectedTopic.description : level.description || ""}</p>
-                    </div>
+                <div class="nb-question" id="nbQuestion" style="display:block"><p>${selectedTopic ? selectedTopic.description : level.description || ""}</p></div>
                 <!-- Cells 區 -->
                 <div class="nb-cells" id="nbCells"></div>
 
@@ -1427,10 +1470,16 @@
             }
             //先載入 CodeMirror，再建立初始 cell
             loadCodeMirror().then(() => {
+                
+                if (topic && topic.example_code) {
+                    createCell(topic.example_code);
+                }
+
                 const starterCode = topic
                     ? `# ${topic.title}\n${topic.starter_code}`
                     : `# ${level.title}\n# ${level.warn}\n\n`;
                 createCell(starterCode);
+                
                 // 鎖定程式碼 
                 const testCode = topic ? topic.test_code : level.test_code;
                 if (testCode) {
