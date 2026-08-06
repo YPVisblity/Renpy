@@ -1,0 +1,11 @@
+{
+  "id": "chapter-2-level-1",
+  "chapter": "第 2 章第一關",
+  "level": "2-1",
+  "title": "等差數列",
+  "difficulty": "40％",
+  "story_url": "http://127.0.0.1:8080/renpy/chapter-2-level-1/",
+  "game_url": "http://127.0.0.1:8888/notebooks/chapter-2-level-1.ipynb",
+  "summary": "2-1描述",
+  "warn": "返回題目點選按鈕，進入關卡"
+}

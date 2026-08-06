@@ -1,0 +1,11 @@
+{
+  "id": "chapter-2-level-3",
+  "chapter": "第 2 章第三關",
+  "level": "2-3",
+  "title": "守衛問答",
+  "difficulty": "40％",
+  "story_url": "http://127.0.0.1:8080/renpy/chapter-2-level-3/",
+  "game_url": "http://127.0.0.1:8888/notebooks/chapter-2-level-3.ipynb",
+  "summary": "2-3描述",
+  "warn": "返回題目點選按鈕，進入關卡"
+}
