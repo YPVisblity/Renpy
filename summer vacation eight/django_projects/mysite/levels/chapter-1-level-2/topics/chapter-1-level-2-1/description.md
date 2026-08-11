@@ -1,0 +1,1 @@
+請定義一個basic(height, weight) 函數，計算BMI判斷過輕、正常、過重。bmi< 18.5為過輕、18.5<=bmi<=24為正常、bmi > 24為過重
