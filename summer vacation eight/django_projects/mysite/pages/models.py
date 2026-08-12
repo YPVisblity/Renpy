@@ -1,4 +1,4 @@
-from django.db import models
+﻿from django.db import models
 from django.contrib.auth.models import User
 # Create your models here
 
@@ -22,8 +22,17 @@ class UserProfile(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.points} points"
 class ShopItem(models.Model):
+    CATEGORY_CHOICES = [
+        ("general", "一般"),
+        ("avatar", "角色"),
+        ("background", "背景"),
+        ("badge", "徽章"),
+        ("powerup", "道具"),
+    ]
+
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
+    category = models.CharField(max_length=30, choices=CATEGORY_CHOICES, default="general")
     price = models.IntegerField(default=0)
     image = models.CharField(max_length=200,blank=True)
     is_active = models.BooleanField(default=False)

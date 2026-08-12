@@ -55,4 +55,5 @@ urlpatterns = [
     path("api/posts/<int:post_id>/reply/", page_views.create_reply, name="create_reply"),
     
     path("levels/<str:level_id>/unlock/", page_views.unlock_level, name="unlock_level"),
+    path("levels/unlock-status/", page_views.levels_unlock_status, name="levels_unlock_status"),
 ]

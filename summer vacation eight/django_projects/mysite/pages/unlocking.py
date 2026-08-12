@@ -51,24 +51,46 @@ def get_unlock_status(user, levels_by_id):
         c = get_chapter_number(lid)
         rule = ldata.get("unlock_rule")
 
+        # 這一關本身可能開放的解鎖管道，不管最後鎖不鎖，都先算出來給前端顯示選項用
+        test_level_id = rule.get("test_level") if isinstance(rule, dict) else None
+        cost = rule.get("cost") if isinstance(rule, dict) else None
+        prev_chapter_gate = bool(c) and c > 1
+
+        def build(unlocked, reason, extra_cost=None):
+            return {
+                "unlocked": unlocked,
+                "reason": reason,
+                "cost": extra_cost,
+                "test_level": test_level_id,
+                "prev_chapter_gate": prev_chapter_gate,
+            }
+
         if lid in manually_unlocked:
-            status[lid] = {"unlocked": True, "reason": "purchased", "cost": None}
+            status[lid] = build(True, "purchased")
             continue
 
         if rule == "free" or c == 1:
-            status[lid] = {"unlocked": True, "reason": "free", "cost": None}
+            status[lid] = build(True, "free")
             continue
 
-        if isinstance(rule, dict) and rule.get("type") == "points":
-            status[lid] = {"unlocked": False, "reason": "points", "cost": rule.get("cost", 0)}
-            continue
-
-        # 預設規則：前一章要全破，這一章才解鎖
+        # 方法一：前一章是否已經全破 -> 自動解鎖
         prev_cleared = chapter_cleared.get(c - 1, False) if c else False
-        status[lid] = {
-            "unlocked": bool(prev_cleared),
-            "reason": "prev_chapter_incomplete" if not prev_cleared else "prev_chapter_cleared",
-            "cost": None,
-        }
+        if prev_cleared:
+            status[lid] = build(True, "prev_chapter_cleared")
+            continue
+
+        # 方法二：是否通過指定的「額外題目」(test_level) -> 自動解鎖
+        if test_level_id:
+            test_level_data = levels_by_id.get(test_level_id)
+            if test_level_data and is_level_cleared(test_level_id, test_level_data, passed_ids):
+                status[lid] = build(True, "test_level_cleared")
+                continue
+
+        # 方法三：前一章還沒全破、額外題目也還沒過時，看這關是否允許用點數提前解鎖
+        if cost is not None:
+            status[lid] = build(False, "points", extra_cost=cost)
+            continue
+
+        status[lid] = build(False, "prev_chapter_incomplete")
 
     return status

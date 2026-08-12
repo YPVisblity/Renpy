@@ -1,4 +1,4 @@
-import sys
+﻿import sys
 import asyncio
 import json
 from datetime import datetime
@@ -40,6 +40,8 @@ def _apply_unlock_status(level_dict, unlock_status):
     level_dict["unlocked"] = info["unlocked"]
     level_dict["unlock_reason"] = info["reason"]
     level_dict["unlock_cost"] = info.get("cost")
+    level_dict["unlock_test_level"] = info.get("test_level")
+    level_dict["unlock_prev_chapter_gate"] = info.get("prev_chapter_gate", False)
 
 def home(request):
 
@@ -53,7 +55,7 @@ def home(request):
         _apply_unlock_status(level, unlock_status)
 
     user_points = 0 
-    shop_items=ShopItem.objects.filter(is_active=True)
+    shop_items=ShopItem.objects.filter(is_active=True).order_by("category", "price", "name")
     owned_item_ids = set()
     profile=None
     if request.user.is_authenticated:
@@ -75,6 +77,7 @@ def home(request):
             "user_name": request.user.username if request.user.is_authenticated else "Guest",
             "user_points": user_points,
             "shop_items":shop_items,
+            "shop_categories": ShopItem.CATEGORY_CHOICES,
             "owned_item_ids":owned_item_ids,
             "profile":profile,
         },)
@@ -149,7 +152,7 @@ def unlock_level(request, level_id):
         return JsonResponse({"error":"找不到關卡"}, status=404)
 
     rule = level_data.get("unlock_rule")
-    if not (isinstance(rule, dict) and rule.get("type") == "points"):
+    if not (isinstance(rule, dict) and rule.get("cost") is not None):
         return JsonResponse({"error":"此關卡不可用點數解鎖"}, status=400)
 
     if LevelUnlock.objects.filter(user=request.user, level=level_id).exists():
@@ -165,6 +168,11 @@ def unlock_level(request, level_id):
     LevelUnlock.objects.create(user=request.user, level=level_id)
 
     return JsonResponse({"message":"解鎖成功", "points": profile.points, "level": level_id})
+
+@login_required
+def levels_unlock_status(request):
+    levels_by_id = get_levels_by_id()
+    return JsonResponse(get_unlock_status(request.user, levels_by_id))
 
 @login_required
 def toggle_like(request, post_id):
@@ -685,3 +693,4 @@ def submit_solution(request):
             "passed": False,
             "feedback": []
         })
+

@@ -1,3 +1,4 @@
+﻿{% load static %}
 <!doctype html>
 <html lang="zh-Hant">
 <head>
@@ -861,10 +862,58 @@
             margin: 0;
         }
 
+        .shop-store-panel {
+            width: min(980px, 100%);
+        }
+
+        .shop-layout {
+            display: grid;
+            grid-template-columns: 180px minmax(0, 1fr);
+            gap: 18px;
+            align-items: start;
+        }
+
         .shop-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 14px;
+        }
+
+        .shop-nav {
+            position: sticky;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 12px;
+            border: 3px solid #111827;
+            border-radius: 8px;
+            background: #e5e7eb;
+        }
+
+        .shop-nav-title {
+            margin: 0 0 4px;
+            color: #374151;
+            font-size: 14px;
+            font-weight: 900;
+        }
+
+        .shop-category-button {
+            width: 100%;
+            border: 2px solid #111827;
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: #111827;
+            background: #ffffff;
+            font-weight: 800;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .shop-category-button.is-active {
+            color: #102018;
+            background: #34d399;
+            box-shadow: inset 0 -4px 0 rgba(16, 32, 24, 0.18);
         }
 
         .shop-item {
@@ -874,6 +923,42 @@
             background: #f8fafc;
         }
 
+        .shop-item-image {
+            display: block;
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            margin-bottom: 12px;
+            border: 2px solid #111827;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #e5e7eb;
+        }
+
+        .shop-item[hidden],
+        .shop-empty[hidden] {
+            display: none;
+        }
+
+        .shop-category-label {
+            display: inline-block;
+            margin-bottom: 8px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            color: #374151;
+            background: #e5e7eb;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .shop-empty {
+            margin: 0;
+            padding: 18px;
+            border: 3px dashed #cbd5e1;
+            border-radius: 8px;
+            color: #64748b;
+            background: #f8fafc;
+            font-weight: 800;
+        }
         .shop-item strong {
             display: block;
             margin-bottom: 8px;
@@ -893,6 +978,32 @@
             color: #64748b;
             background: #cbd5e1;
             cursor: not-allowed;
+        }
+
+        .unlock-toast {
+            position: fixed;
+            top: 90px;
+            right: 22px;
+            z-index: 30;
+            max-width: 320px;
+            padding: 16px 18px;
+            border: 3px solid #111827;
+            border-radius: 8px;
+            color: #102018;
+            background: #34d399;
+            box-shadow: 0 12px 0 #167853, 0 18px 38px rgba(0, 0, 0, 0.32);
+            font-weight: 800;
+            animation: unlock-toast-in 0.25s ease-out;
+        }
+
+        .unlock-toast p {
+            margin: 6px 0 0;
+            font-weight: 700;
+        }
+
+        @keyframes unlock-toast-in {
+            from { transform: translateY(-12px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         @media (max-width: 880px) {
@@ -915,8 +1026,21 @@
 
             .discussion-grid,
             .stats-grid,
-            .submit-grid {
+            .submit-grid,
+            .shop-layout {
                 grid-template-columns: 1fr;
+            }
+
+            .shop-nav {
+                position: static;
+                order: -1;
+                flex-direction: row;
+                overflow-x: auto;
+            }
+
+            .shop-category-button {
+                min-width: 104px;
+                text-align: center;
             }
         }
     </style>
@@ -964,8 +1088,11 @@
                     {% for level in levels %}
                         <button class="level-node {% if not level.unlocked %}is-locked{% endif %}"
                                 data-level="{{ level.id }}"
+                                data-index="{{ forloop.counter }}"
                                 data-unlocked="{{ level.unlocked|yesno:'true,false' }}"
                                 data-unlock-cost="{{ level.unlock_cost|default_if_none:'' }}"
+                                data-unlock-test-level="{{ level.unlock_test_level|default_if_none:'' }}"
+                                data-unlock-prev-chapter-gate="{{ level.unlock_prev_chapter_gate|yesno:'true,false' }}"
                                 style="--lift: {{ forloop.counter0|divisibleby:2|yesno:'0,1' }};">
                             <span class="level-island">
                                 <span class="level-icon">{% if level.unlocked %}{{ forloop.counter }}{% else %}🔒{% endif %}</span>
@@ -1000,7 +1127,7 @@
     </div>
     <!-- 商店 -->
     <div class="shop-modal" id="shopModal" hidden>
-        <section class="shop-panel" role="dialog" aria-modal="true" aria-labelledby="shopTitle">
+        <section class="shop-panel shop-store-panel" role="dialog" aria-modal="true" aria-labelledby="shopTitle">
             <div class="shop-head">
                 <div>
                     <h2 id="shopTitle">商店</h2>
@@ -1010,23 +1137,53 @@
                 </div>
                 <button class="secondary-button" type="button" id="closeShopButton">關閉</button>
             </div>
-            <div class="shop-grid">
-                {% for item in shop_items %}
-                    <div class="shop-item">
-                        <strong>{{ item.name }}</strong>
-                        <p>{{ item.description }}</p>
-                        <div>{{ item.price }} point</div>
+            <div class="shop-layout">
+                <nav class="shop-nav" aria-label="商店分類">
+                    <p class="shop-nav-title">分類</p>
+                    <button class="shop-category-button is-active" type="button" data-category="all">全部</button>
+                    {% for category_key, category_label in shop_categories %}
+                        <button class="shop-category-button" type="button" data-category="{{ category_key }}">{{ category_label }}</button>
+                    {% endfor %}
+                </nav>
+                <div>
+                    <div class="shop-grid" id="shopGrid">
+                        {% for item in shop_items %}
+                            <div class="shop-item" data-category="{{ item.category }}">
+                                {% if item.image %}
+                                    <img class="shop-item-image" src="{% static item.image %}" alt="{{ item.name }}">
+                                {% endif %}
+                                <span class="shop-category-label">{{ item.get_category_display }}</span>
+                                <strong>{{ item.name }}</strong>
+                                <p>{{ item.description }}</p>
+                                <div>{{ item.price }} point</div>
 
-                        {% if item.id in owned_item_ids %}
-                            <button type="button" disabled>已購買</button>
-                        {% else %}
-                            <button type="button" class="buy-item" data-item-id="{{ item.id }}">購買</button>
-                        {% endif %}
+                                {% if item.id in owned_item_ids %}
+                                    <button type="button" disabled>已購買</button>
+                                {% else %}
+                                    <button type="button" class="buy-item" data-item-id="{{ item.id }}">購買</button>
+                                {% endif %}
+                            </div>
+                        {% empty %}
+                            <p class="shop-empty">目前沒有商品</p>
+                        {% endfor %}
                     </div>
-                {% empty %}
-                    <p>目前沒有商品</p>
-                {% endfor %}
+                    <p class="shop-empty" id="shopCategoryEmpty" hidden>這個分類目前沒有商品</p>
+                </div>
             </div>
+        </section>
+    </div>
+
+    <!-- 解鎖選項 -->
+    <div class="shop-modal" id="unlockModal" hidden>
+        <section class="shop-panel" role="dialog" aria-modal="true" aria-labelledby="unlockModalTitle">
+            <div class="shop-head">
+                <div>
+                    <h2 id="unlockModalTitle">關卡尚未解鎖</h2>
+                    <p id="unlockModalSubtitle">符合以下任一條件即可解鎖：</p>
+                </div>
+                <button class="secondary-button" type="button" id="closeUnlockModal">關閉</button>
+            </div>
+            <div class="shop-grid" id="unlockOptions"></div>
         </section>
     </div>
 
@@ -1142,6 +1299,7 @@
             </div>
             `;
             initNotebook(level);
+
             return;
             }
             if (selectedTab === "topic"){
@@ -1237,12 +1395,7 @@
             }
 
             if (level && level.unlocked === false) {
-                if (level.unlock_reason === "points") {
-                    const buy = confirm(`此關卡需要花費 ${level.unlock_cost} 點數解鎖，是否要解鎖？`);
-                    if (buy) unlockLevel(levelId);
-                    return;
-                }
-                alert("請先完成前一章的所有關卡才能解鎖！");
+                showUnlockOptions(levelId, level);
                 return;
             }
 
@@ -1266,7 +1419,130 @@
                 return;
             }
             alert("解鎖成功");
-            location.reload(); 
+            location.reload();
+        }
+
+        //解鎖選項彈窗
+        const unlockModal = document.getElementById("unlockModal");
+        const unlockModalTitle = document.getElementById("unlockModalTitle");
+        const unlockOptions = document.getElementById("unlockOptions");
+        const closeUnlockModalButton = document.getElementById("closeUnlockModal");
+
+        function hideUnlockModal() {
+            unlockModal.hidden = true;
+        }
+
+        closeUnlockModalButton?.addEventListener("click", hideUnlockModal);
+        unlockModal?.addEventListener("click", (event) => {
+            if (event.target === unlockModal) hideUnlockModal();
+        });
+
+        function showUnlockOptions(levelId, level) {
+            unlockModalTitle.textContent = `「${level.title}」尚未解鎖`;
+            const options = [];
+
+            if (level.unlock_test_level && levels[level.unlock_test_level]) {
+                const testLevel = levels[level.unlock_test_level];
+                options.push(`
+                    <div class="shop-item">
+                        <strong>通過額外題目「${testLevel.title}」</strong>
+                        <p>先挑戰這一關額外題目，過關後這一關會直接解鎖。</p>
+                        <button type="button" data-goto-level="${level.unlock_test_level}">前往挑戰</button>
+                    </div>
+                `);
+            }
+
+            if (level.unlock_prev_chapter_gate) {
+                options.push(`
+                    <div class="shop-item">
+                        <strong>完成前一章所有關卡</strong>
+                        <p>把前一章的每一小關全部過關，這一關就會自動解鎖。</p>
+                    </div>
+                `);
+            }
+
+            if (level.unlock_cost !== null && level.unlock_cost !== undefined) {
+                options.push(`
+                    <div class="shop-item">
+                        <strong>花費點數解鎖</strong>
+                        <p>花費 ${level.unlock_cost} 點數，直接解鎖這一關。</p>
+                        <button type="button" data-buy-level="${levelId}">花費 ${level.unlock_cost} 點解鎖</button>
+                    </div>
+                `);
+            }
+
+            if (options.length === 0) {
+                options.push(`<div class="shop-item"><p>此關卡目前尚未開放解鎖條件。</p></div>`);
+            }
+
+            unlockOptions.innerHTML = options.join("");
+
+            unlockOptions.querySelectorAll("[data-goto-level]").forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    hideUnlockModal();
+                    openLevel(btn.dataset.gotoLevel);
+                });
+            });
+
+            unlockOptions.querySelectorAll("[data-buy-level]").forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    hideUnlockModal();
+                    unlockLevel(btn.dataset.buyLevel);
+                });
+            });
+
+            unlockModal.hidden = false;
+        }
+
+        function showUnlockToast(titles) {
+            const toast = document.createElement("div");
+            toast.className = "unlock-toast";
+            toast.innerHTML = `
+                <div>解鎖新關卡！</div>
+                <p>${titles.join("、")}</p>
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        async function refreshUnlockStatus() {
+            let status;
+            try {
+                const res = await fetch("/levels/unlock-status/");
+                if (!res.ok) return;
+                status = await res.json();
+            } catch (err) {
+                return;
+            }
+
+            const newlyUnlockedTitles = [];
+
+            Object.entries(status).forEach(([lid, info]) => {
+                const level = levels[lid];
+                if (!level) return;
+
+                const wasLocked = level.unlocked === false;
+                level.unlocked = info.unlocked;
+                level.unlock_reason = info.reason;
+                level.unlock_cost = info.cost;
+                level.unlock_test_level = info.test_level;
+                level.unlock_prev_chapter_gate = info.prev_chapter_gate;
+
+                if (wasLocked && info.unlocked) newlyUnlockedTitles.push(level.title);
+
+                const node = document.querySelector(`.level-node[data-level="${lid}"]`);
+                if (!node) return;
+                node.classList.toggle("is-locked", !info.unlocked);
+                node.dataset.unlocked = info.unlocked ? "true" : "false";
+                node.dataset.unlockCost = info.cost ?? "";
+                node.dataset.unlockTestLevel = info.test_level ?? "";
+                node.dataset.unlockPrevChapterGate = info.prev_chapter_gate ? "true" : "false";
+
+                const icon = node.querySelector(".level-icon");
+                if (icon) icon.textContent = info.unlocked ? node.dataset.index : "🔒";
+            });
+
+            if (newlyUnlockedTitles.length) showUnlockToast(newlyUnlockedTitles);
         }
 
         //建立單一 Cell
@@ -1499,6 +1775,8 @@
                 </ul>
             `;
             }
+
+            if (result.passed) refreshUnlockStatus();
             } catch (err) {
                 if (err.name === "AbortError") {
                     status.textContent = "提交逾時，請稍後再試。";
@@ -1771,6 +2049,9 @@
         const shopModal = document.getElementById("shopModal");
         const openShopButton = document.getElementById("openShopButton");
         const closeShopButton = document.getElementById("closeShopButton");
+        const shopCategoryButtons = document.querySelectorAll(".shop-category-button");
+        const shopItems = document.querySelectorAll(".shop-item[data-category]");
+        const shopCategoryEmpty = document.getElementById("shopCategoryEmpty");
 
         openShopButton?.addEventListener("click", () => {
             shopModal.hidden = false;
@@ -1784,6 +2065,29 @@
             if (event.target === shopModal) {
                 shopModal.hidden = true;
             }
+        });
+
+        shopCategoryButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+                const selectedCategory = button.dataset.category;
+                let visibleCount = 0;
+
+                shopCategoryButtons.forEach((categoryButton) => {
+                    categoryButton.classList.toggle("is-active", categoryButton === button);
+                });
+
+                shopItems.forEach((item) => {
+                    const shouldShow = selectedCategory === "all" || item.dataset.category === selectedCategory;
+                    item.hidden = !shouldShow;
+                    if (shouldShow) {
+                        visibleCount += 1;
+                    }
+                });
+
+                if (shopCategoryEmpty) {
+                    shopCategoryEmpty.hidden = visibleCount > 0;
+                }
+            });
         });
 
         document.querySelectorAll(".buy-item").forEach((button) => {
@@ -1819,3 +2123,5 @@
     </script>
 </body>
 </html>
+
+
