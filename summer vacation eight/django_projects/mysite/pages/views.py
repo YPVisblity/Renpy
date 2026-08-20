@@ -524,10 +524,13 @@ def ai_chat(request):
             若詢問 Lv1-1-1（題目：蘋果價格與數量計算）：
             def value(x, y):
                 if x == 0 or y == 0:
-                    return "EOFError"
+                    return "ERROR"
                 else:
                     return x * y
-            並且說明為何要這麼做。
+            並且說明為何要這麼做，其題目為:(蘋果的價格為26元，請問小明購買6個蘋果需要多少錢?	
+            請用value(x,y)計算蘋果總價為何? 
+            設定 if 條件判斷其中一值為 0 傳回ERROR
+            # 提示:利用運算子來達成你的目的，可在cells裡自由測試value()的計算結果，這裡是除錯用的不計入評分。)
 
             若詢問 Lv1-2-1（題目：BMI 測量）：
             def basic(h, w):

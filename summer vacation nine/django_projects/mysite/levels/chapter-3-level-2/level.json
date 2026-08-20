@@ -1,0 +1,12 @@
+{
+  "id": "chapter-3-level-2",
+  "chapter": "第 3 章第二關",
+  "level": "3-2",
+  "title": "函式工坊",
+  "difficulty": "60％",
+  "story_url": "http://127.0.0.1:8080/renpy/chapter-3-level-2/",
+  "game_url": "http://127.0.0.1:8888/notebooks/chapter-3-level-2.ipynb",
+  "summary": "3-2描述",
+  "warn":"返回題目點選按鈕，進入關卡",
+  "unlock_rule": {"cost": 5, "test_level": "chapter-3-bonus-1"}
+}

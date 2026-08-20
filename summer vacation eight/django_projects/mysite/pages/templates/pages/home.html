@@ -100,28 +100,28 @@
             color: #f8fafc;
             background: #334155;
         }
-	.ai-button {
-	    display: inline-block;
-	    padding: 14px 24px;
-	    color: #10202d;       
-	    background: #3b82f6;      
-	    box-shadow: 0 12px 0 #1d4ed8, 0 18px 38px rgba(0, 0, 0, 0.32); 
-	    /* #可加可不加 
-	    border: none;
-	    border-radius: 12px;   
-	    font-weight: bold;    
-	    text-decoration: none; 
-	    cursor: pointer; */
-	}
-	
-	.ai-button:hover {
-	    background: #60a5fa;
-	}
-	
-	.ai-button:active {
-	    box-shadow: 0 4px 0 #1d4ed8, 0 8px 18px rgba(0, 0, 0, 0.32);
-	    transform: translateY(8px); 
-	}
+        .ai-button {
+            display: inline-block;
+            padding: 14px 24px;
+            color: #10202d;       
+            background: #3b82f6;      
+            box-shadow: 0 12px 0 #1d4ed8, 0 18px 38px rgba(0, 0, 0, 0.32); 
+            /* #可加可不加 
+            border: none;
+            border-radius: 12px;   
+            font-weight: bold;    
+            text-decoration: none; 
+            cursor: pointer; */
+        }
+        
+        .ai-button:hover {
+            background: #60a5fa;
+        }
+        
+        .ai-button:active {
+            box-shadow: 0 4px 0 #1d4ed8, 0 8px 18px rgba(0, 0, 0, 0.32);
+            transform: translateY(8px); 
+        }
 	
         .start-screen {
             display: grid;
@@ -250,14 +250,216 @@
         }
         
         .notebook-wrap {
-	    display: flex;
-	    flex-direction: column;
-	    background: #0d0d1a;
-	    border-radius: 8px;
-	    overflow: hidden;
-	    font-family: 'Fira Code', 'JetBrains Mono', monospace;
-	    min-height: 400px;
-	}
+            display: flex;
+            flex-direction: column;
+            background: #0d0d1a;
+            border-radius: 8px;
+            overflow: hidden;
+            font-family: 'Fira Code', 'JetBrains Mono', monospace;
+            min-height: 400px;
+        }
+
+                /* AI 小助手按鈕 */
+        .ai-avatar-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            border: 0;
+            border-radius: 50%;
+            background: #3b82f6;
+            box-shadow: 0 8px 0 #1d4ed8, 0 14px 28px rgba(0, 0, 0, 0.32);
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+        .ai-avatar-btn:hover {
+            transform: translateY(-2px);
+            background: #60a5fa;
+        }
+        .ai-avatar-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 4px 0 #1d4ed8, 0 8px 16px rgba(0, 0, 0, 0.32);
+        }
+        .ai-avatar-icon {
+            font-size: 22px;
+        }
+
+        /* 浮動聊天視窗 */
+        .ai-float-panel {
+            position: fixed;
+            top: 100px;
+            right: 24px;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            width: 340px;
+            height: 440px;
+            min-width: 260px;
+            min-height: 280px;
+            max-width: 90vw;
+            max-height: 80vh;
+            border: 4px solid #0b1220;
+            border-radius: 10px;
+            background: #0f172a;
+            box-shadow: 0 18px 0 rgba(0, 0, 0, 0.24), 0 24px 48px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+        }
+        .ai-float-panel[hidden] {
+            display: none;
+        }
+
+        .ai-float-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            background: #111827;
+            color: #f8fafc;
+            font-weight: 800;
+            cursor: move;
+            user-select: none;
+            flex-shrink: 0;
+        }
+        .ai-float-title {
+            font-size: 14px;
+        }
+        #aiFloatContext {
+            margin-left: 6px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: #34d399;
+            color: #102018;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .ai-float-close {
+            border: 0;
+            background: transparent;
+            color: #f8fafc;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .ai-float-close:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .ai-float-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: #0b1120;
+        }
+        .ai-float-msg {
+            max-width: 85%;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .ai-float-msg-user {
+            align-self: flex-end;
+            background: #34d399;
+            color: #102018;
+            font-weight: 700;
+            border-bottom-right-radius: 2px;
+        }
+        .ai-float-msg-bot {
+            align-self: flex-start;
+            background: #1e293b;
+            color: #e2e8f0;
+            border-bottom-left-radius: 2px;
+        }
+        .ai-float-msg-loading {
+            align-self: flex-start;
+            color: #64748b;
+            font-size: 12px;
+            font-style: italic;
+        }
+
+        .ai-float-input-row {
+            display: flex;
+            gap: 8px;
+            padding: 10px;
+            background: #111827;
+            align-items: flex-end;
+            flex-shrink: 0;
+        }
+        .ai-float-input {
+            flex: 1 1 auto;
+            resize: none;
+            padding: 6px 10px;
+            border: 2px solid #334155;
+            border-radius: 6px;
+            background: #0f172a;
+            color: #f8fafc;
+            font: inherit;
+            font-size: 13px;
+            line-height: 20px;
+            height: 32px;
+            min-height: 32px;
+            max-height: 80px;
+            box-sizing: border-box;
+            overflow-x: hidden;
+            overflow-y: hidden;
+        }
+        .ai-float-input::-webkit-scrollbar {
+            width: 4px;
+        }
+        .ai-float-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        .ai-float-send {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            border: 0;
+            border-radius: 6px;
+            padding: 0 16px;
+            background: #3b82f6;
+            color: #fff;
+            font-weight: 800;
+            font-size: 13px;
+            height: 32px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .ai-float-send:hover {
+            background: #60a5fa;
+        }
+        .ai-float-send:disabled {
+            background: #475569;
+            cursor: not-allowed;
+        }
+
+        .ai-float-resize {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            width: 18px;
+            height: 18px;
+            cursor: nwse-resize;
+            background: linear-gradient(135deg, transparent 50%, #334155 50%);
+        }
+
+        #notebookWrap:fullscreen,
+        #notebookWrap:-webkit-full-screen {
+            width: 100vw;
+            height: 100vh;
+            border-radius: 0;
+            overflow-y: auto;
+            background: #0d0d1a;
+        }
+
         .topic-heading {
             margin: 0 0 16px;
             color: #111827;
@@ -1063,6 +1265,9 @@
                 {% endif %}
                 <a class="primary-button" href="/admin/">管理</a>
          	<a class="ai-button" href="{% url 'ai_chat' %}">AI問答區 </a>
+                <button class="ai-avatar-btn" type="button" id="aiAvatarBtn" title="開啟 AI 小助手">
+                    <span class="ai-avatar-icon">AI小助手</span>
+                </button>
             </div>
         </header>
 
@@ -1173,6 +1378,22 @@
         </section>
     </div>
 
+        <!-- AI 小助手浮動視窗 -->
+    <div class="ai-float-panel" id="aiFloatPanel" hidden>
+        <div class="ai-float-header" id="aiFloatHeader">
+            <span class="ai-float-title">AI 小助手<span id="aiFloatContext"></span></span>
+            <button class="ai-float-close" type="button" id="aiFloatClose">✕</button>
+        </div>
+        <div class="ai-float-body" id="aiFloatBody">
+            <div class="ai-float-msg ai-float-msg-bot">嗨！我是 AI 小助手，有任何 Python 問題都可以問我喔！</div>
+        </div>
+        <div class="ai-float-input-row">
+            <textarea class="ai-float-input" id="aiFloatInput" placeholder="輸入你的問題..."></textarea>
+            <button class="ai-float-send" type="button" id="aiFloatSend">送出</button>
+        </div>
+        <div class="ai-float-resize" id="aiFloatResize"></div>
+    </div>
+
     <!-- 解鎖選項 -->
     <div class="shop-modal" id="unlockModal" hidden>
         <section class="shop-panel" role="dialog" aria-modal="true" aria-labelledby="unlockModalTitle">
@@ -1186,6 +1407,8 @@
             <div class="shop-grid" id="unlockOptions"></div>
         </section>
     </div>
+
+    
 
     <script>
         const levels = {{ levels_json|safe }};
@@ -1244,7 +1467,7 @@
 
             if (selectedTab === "story") {
                tabBody.innerHTML = `
-                    <div style="position:relative;">
+                    <div style="position:relative;" id="storyFullscreenWrap">
                         <button id="fullscreenBtn" style="
                             position:absolute; top:8px; right:8px; z-index:10;
                             padding:6px 12px; border:none; border-radius:6px;
@@ -1257,11 +1480,21 @@
                 `;
 
                 document.getElementById("fullscreenBtn").addEventListener("click", () => {
-                    const wrap = document.getElementById("iframeWrap");
-                    if (wrap.requestFullscreen) {
-                        wrap.requestFullscreen();
-                    } else if (wrap.webkitRequestFullscreen) {
-                        wrap.webkitRequestFullscreen();
+                    const wrap = document.getElementById("storyFullscreenWrap");
+                    const fullscreenElement = document.fullscreenElement || document.webkitFullscreenElement;
+                    if (!fullscreenElement) {
+                            if (wrap.requestFullscreen) {
+                            wrap.requestFullscreen();
+                        } else if (wrap.webkitRequestFullscreen) {
+                            wrap.webkitRequestFullscreen();
+                        }
+                    }
+                    else if (fullscreenElement) {
+                        if (document.exitFullscreen) {
+                            document.exitFullscreen();
+                        } else if (document.webkitExitFullscreen) {
+                            document.webkitExitFullscreen();
+                        }
                     }
                 });
                 return;
@@ -1269,7 +1502,7 @@
 
             if (selectedTab === "game") {
             tabBody.innerHTML = `
-            <div class="notebook-wrap">
+            <div class="notebook-wrap" id="notebookWrap">
                 <!-- Notebook Toolbar -->
                 <div class="nb-toolbar">
                     <span class="nb-title">${level.title}</span>
@@ -1277,6 +1510,7 @@
                         <button class="nb-btn" id="questionBtn">收起題目</button>
                         <button class="nb-btn" id="runAllBtn">▶▶ Run All</button>
                         <button class="nb-btn" id="addCellBtn">＋ 新增 Cell</button>
+                        <button class="nb-btn" id="fullscreenBtn">全螢幕</button>
                     </div>
                 </div>
                 <!--Question區-->
@@ -1504,6 +1738,161 @@
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 4000);
         }
+
+                // ========== AI 小助手浮動視窗 ==========
+        const aiAvatarBtn = document.getElementById("aiAvatarBtn");
+        const aiFloatPanel = document.getElementById("aiFloatPanel");
+        const aiFloatHeader = document.getElementById("aiFloatHeader");
+        const aiFloatClose = document.getElementById("aiFloatClose");
+        const aiFloatBody = document.getElementById("aiFloatBody");
+        const aiFloatInput = document.getElementById("aiFloatInput");
+        const aiFloatSend = document.getElementById("aiFloatSend");
+        const aiFloatContext = document.getElementById("aiFloatContext");
+        const aiFloatResize = document.getElementById("aiFloatResize");
+
+        function updateAiFloatContext() {
+            if (!aiFloatContext) return;
+            if (selectedTopic) {
+                aiFloatContext.textContent = selectedTopic.title;
+                aiFloatContext.hidden = false;
+            } else {
+                aiFloatContext.textContent = "";
+                aiFloatContext.hidden = true;
+            }
+        }
+
+        function appendAiFloatMsg(text, role) {
+            const msg = document.createElement("div");
+            msg.className = `ai-float-msg ai-float-msg-${role}`;
+            msg.textContent = text;
+            aiFloatBody.appendChild(msg);
+            aiFloatBody.scrollTop = aiFloatBody.scrollHeight;
+            return msg;
+        }
+
+        aiAvatarBtn?.addEventListener("click", () => {
+            aiFloatPanel.hidden = !aiFloatPanel.hidden;
+            if (!aiFloatPanel.hidden) {
+                updateAiFloatContext();
+                aiFloatInput.focus();
+            }
+        });
+
+        aiFloatClose?.addEventListener("click", () => {
+            aiFloatPanel.hidden = true;
+        });
+
+        async function sendAiFloatMessage() {
+            const question = aiFloatInput.value.trim();
+            if (!question) return;
+
+            // 帶入目前選中的 topic 作為上下文
+            const contextPrefix = selectedTopic
+                ? `[目前關卡：${selectedTopic.title}] `
+                : "";
+            const fullMessage = contextPrefix + question;
+
+            appendAiFloatMsg(question, "user");
+            aiFloatInput.value = "";
+            aiFloatInput.style.height = "auto";
+            aiFloatSend.disabled = true;
+
+            const loadingMsg = appendAiFloatMsg("思考中...", "loading");
+
+            try {
+                const response = await fetch("{% url 'ai_chat' %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": getCookie("csrftoken"),
+                    },
+                    body: JSON.stringify({ message: fullMessage }),
+                });
+                const data = await response.json();
+                loadingMsg.remove();
+
+                if (data.reply) {
+                    appendAiFloatMsg(data.reply, "bot");
+                } else {
+                    appendAiFloatMsg(data.error || "發生錯誤，請稍後再試。", "bot");
+                }
+            } catch (err) {
+                loadingMsg.remove();
+                appendAiFloatMsg("連線失敗，請確認網路狀態。", "bot");
+            } finally {
+                aiFloatSend.disabled = false;
+            }
+        }
+
+        aiFloatSend?.addEventListener("click", sendAiFloatMessage);
+        aiFloatInput?.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                sendAiFloatMessage();
+            }
+        });
+        aiFloatInput?.addEventListener("input", () => {
+            aiFloatInput.style.height = "32px";
+            aiFloatInput.style.height = Math.min(aiFloatInput.scrollHeight,80)+"px";
+        });
+
+        // 拖曳視窗
+        (function enableDrag() {
+            let isDragging = false;
+            let offsetX = 0, offsetY = 0;
+
+            aiFloatHeader?.addEventListener("mousedown", (e) => {
+                if (e.target === aiFloatClose) return;
+                isDragging = true;
+                const rect = aiFloatPanel.getBoundingClientRect();
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+                aiFloatPanel.style.right = "auto";
+                aiFloatPanel.style.left = rect.left + "px";
+                aiFloatPanel.style.top = rect.top + "px";
+            });
+
+            document.addEventListener("mousemove", (e) => {
+                if (!isDragging) return;
+                let newLeft = e.clientX - offsetX;
+                let newTop = e.clientY - offsetY;
+                newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - aiFloatPanel.offsetWidth));
+                newTop = Math.max(0, Math.min(newTop, window.innerHeight - aiFloatPanel.offsetHeight));
+                aiFloatPanel.style.left = newLeft + "px";
+                aiFloatPanel.style.top = newTop + "px";
+            });
+
+            document.addEventListener("mouseup", () => {
+                isDragging = false;
+            });
+        })();
+
+        // 縮放視窗
+        (function enableResize() {
+            let isResizing = false;
+            let startX = 0, startY = 0, startWidth = 0, startHeight = 0;
+
+            aiFloatResize?.addEventListener("mousedown", (e) => {
+                isResizing = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                startWidth = aiFloatPanel.offsetWidth;
+                startHeight = aiFloatPanel.offsetHeight;
+                e.preventDefault();
+            });
+
+            document.addEventListener("mousemove", (e) => {
+                if (!isResizing) return;
+                const newWidth = startWidth + (e.clientX - startX);
+                const newHeight = startHeight + (e.clientY - startY);
+                aiFloatPanel.style.width = Math.max(260, newWidth) + "px";
+                aiFloatPanel.style.height = Math.max(280, newHeight) + "px";
+            });
+
+            document.addEventListener("mouseup", () => {
+                isResizing = false;
+            });
+        })();
 
         async function refreshUnlockStatus() {
             let status;
@@ -1838,6 +2227,23 @@
             for (const id of nbCells.keys()) await runCell(id);
             });
             document.getElementById("submitButton").addEventListener("click", () => submitNotebook(selectedTopic));
+            document.getElementById("fullscreenBtn").addEventListener("click", () => {
+                const wrap = document.getElementById("notebookWrap");
+                const fullscreenElement = document.fullscreenElement || document.webkitFullscreenElement;
+                if (!fullscreenElement) {
+                    if (wrap.requestFullscreen) {
+                        wrap.requestFullscreen();
+                    } else if (wrap.webkitRequestFullscreen) {
+                        wrap.webkitRequestFullscreen();
+                    }
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    }
+                }
+            });
         }
         // 鎖定cell
         function createLockedCell(code) {
