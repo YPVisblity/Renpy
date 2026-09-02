@@ -1,0 +1,19 @@
+a {
+  color: darkgreen;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+body {
+  background: #ffefc4;
+  background-image: url(images/undead.png), url(images/backgroundorangeline.png);
+  background-position: right top, right;
+  background-repeat: no-repeat, repeat;
+  background-size: 30%, 120% 50%;
+}
+
+ul {
+  list-style-type: circle;
+  font-size: 20px;
+  font-weight: bold;
+}
