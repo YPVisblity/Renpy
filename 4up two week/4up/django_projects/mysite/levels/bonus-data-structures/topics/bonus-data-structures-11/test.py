@@ -1,1 +1,0 @@
-ref_bfs = bfs(graph, "A")
