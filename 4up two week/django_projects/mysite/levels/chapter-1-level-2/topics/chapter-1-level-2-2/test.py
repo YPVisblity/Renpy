@@ -1,0 +1,5 @@
+print(grade(95))
+print(grade(86))
+print(grade(72))
+print(grade(64))
+print(grade(40))
