@@ -30,6 +30,7 @@ from .pybryt_patch import patch_pybryt_execute_notebook
 
 patch_pybryt_execute_notebook()
 client = genai.Client(api_key=settings.GEMINI_API_KEY)
+# client = anthropic.Anthropic(api_key=settings.CLAUDE_API_KEY)
 
 DEFAULT_AVATAR_IDS = ["default1", "default2", "default3", "default4"] #預設圖片
 EDITABLE_STUDENT_FILE_TYPES = {".ipynb", ".py", ".txt", ".json", ".md"}
@@ -639,7 +640,7 @@ def ai_chat(request):
                 tools=None,
                 system_instruction=[
                     types.Part.from_text(
-            text="""
+            text ="""
             你是一個Python程式教學AI助手。請遵守以下規則:
 
             領域限制:
