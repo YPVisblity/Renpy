@@ -694,7 +694,14 @@
         }
         .nb-cell-locked {
             border-left: 3px solid #e0af68 !important;
-            opacity: 0.9;
+            background: #23233f;
+            opacity: 0.95;
+        }
+        .nb-cell-locked .nb-cell-gutter {
+            background: #17172c;
+        }
+        .nb-cell-locked .nb-editor {
+            background: #23233f;
         }
         .nb-locked-badge {
             position: absolute;
@@ -702,9 +709,18 @@
             right: 8px;
             font-size: 11px;
             color: #e0af68;
+            background: rgba(224, 175, 104, 0.12);
+            border: 1px solid rgba(224, 175, 104, 0.4);
+            border-radius: 10px;
+            padding: 1px 8px;
+            letter-spacing: 0.5px;
         }
-
+        
+        .nb-locked-badge::before {
+            content: "🔒";
+        }
         .nb-cell-locked .CodeMirror {
+            background: #23233f !important;
             cursor: not-allowed !important;
         }
         .nb-title { color: #a9b1d6; font-size: 13px; font-weight: 600; }
@@ -3044,7 +3060,7 @@
             loadCodeMirror().then(() => {
                 
                 if (topic && topic.example_code) {
-                    createCell(topic.example_code);
+                    createLockedCell(topic.example_code);
                 }
 
                 const starterCode = topic
@@ -3113,7 +3129,7 @@
                 <div class="nb-editor" id="editor-${id}"></div>
                 <div class="nb-output" id="output-${id}"></div>
             </div>
-            <span class="nb-locked-badge">測試區</span>
+            <span class="nb-locked-badge">範例（唯讀）</span>
         `;
 
         document.getElementById("nbCells").appendChild(cellEl);
