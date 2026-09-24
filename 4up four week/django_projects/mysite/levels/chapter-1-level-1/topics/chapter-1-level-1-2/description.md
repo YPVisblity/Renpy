@@ -1,5 +1,3 @@
-小華今年10歲，體重32.5公斤。
-
 請定義introduce(name,age,weight) 函式：
 name 是字串（姓名）
 age 是整數（年齡）

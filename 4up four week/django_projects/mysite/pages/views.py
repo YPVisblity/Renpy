@@ -123,7 +123,7 @@ def home(request):
             "show_onboarding":request.session.pop("show_onboarding",False),
             "user_avatar_url": user_avatar_url,
             "background_url": background_url,
-            "ai_chat_free_daily_limit": AI_CHAT_FREE_DAILY_LIMIT,
+            "ai_chat_free_daily_limit": AI_CHAT_FREE_DAILY_LIMIT, #免費次數上限及剩餘次數
             "ai_chat_remaining_free": ai_chat_remaining_free,
             "announcements": announcements,
         },)
